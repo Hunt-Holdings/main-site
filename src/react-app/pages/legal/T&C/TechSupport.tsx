@@ -1,7 +1,7 @@
 import ReactMarkdown from "react-markdown";
-import termsRaw from "../../assets/markdown/TechnicalSupport.md?raw";
+import termsRaw from "../../../assets/markdown/TechnicalSupport.md?raw";
 
-const Terms = () => {
+const TechSupportTerms = () => {
   const companyName = import.meta.env.VITE_COMPANY_NAME ?? "Company Not Found";
   const phone = import.meta.env.VITE_PHONE_NUMBER ?? "555-555-5555";
   const email = import.meta.env.VITE_EMAIL ?? "email@notfound.404";
@@ -40,7 +40,9 @@ const Terms = () => {
         <div className="container">
           <div className="section-header">
             <span className="section-eyebrow">Legal</span>
-            <h1 className="section-title">Terms and Conditions</h1>
+            <h1 className="section-title">
+              Technical Support Terms and Conditions
+            </h1>
           </div>
         </div>
       </section>
@@ -77,4 +79,4 @@ const Terms = () => {
   );
 };
 
-export default Terms;
+export default TechSupportTerms;
