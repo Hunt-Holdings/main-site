@@ -15,7 +15,7 @@ export default function Layout() {
       </main>
 
       <footer style={{ padding: "16px 20px", borderTop: "1px solid #ddd" }}>
-        <small>© {new Date().getFullYear()} Hunt Holdings LLC</small>
+        <small>© {new Date().getFullYear()} Hunt Technology Group</small>
       </footer>
     </>
   );

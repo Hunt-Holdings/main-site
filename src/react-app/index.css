@@ -34,10 +34,8 @@
   /* Shadows - Adjusted for dark mode */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5),
-    0 4px 6px -4px rgb(0 0 0 / 0.4);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6),
-    0 8px 10px -6px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.5);
   --shadow-glow: 0 0 20px rgba(167, 139, 250, 0.15);
 
   /* Border Radius */
@@ -125,6 +123,43 @@ body {
   color: var(--color-primary);
 }
 
+/* Hamburger button (hidden on desktop) */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 2rem;
+  height: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.nav-hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--color-text-primary);
+  border-radius: 2px;
+  transition: var(--transition);
+  transform-origin: center;
+}
+
+.nav-hamburger.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-hamburger.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
 /* Hero Section */
 .hero {
   padding: 10rem var(--container-padding) var(--section-padding);
@@ -140,11 +175,7 @@ body {
   right: 0;
   width: 50%;
   height: 100%;
-  background: radial-gradient(
-    circle at top right,
-    rgba(167, 139, 250, 0.08) 0%,
-    transparent 60%
-  );
+  background: radial-gradient(circle at top right, rgba(167, 139, 250, 0.08) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -333,11 +364,7 @@ body {
   right: 10%;
   width: 180px;
   animation-delay: 1s;
-  background: linear-gradient(
-    135deg,
-    var(--color-primary) 0%,
-    var(--color-primary-dark) 100%
-  );
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   color: #0f172a;
   border: none;
   box-shadow: var(--shadow-glow);
@@ -427,6 +454,7 @@ body {
   border-radius: var(--radius-xl);
   padding: 2.5rem;
   transition: var(--transition);
+  container-type: inline-size;
 }
 
 .service-card:hover {
@@ -452,9 +480,10 @@ body {
 
 .service-title {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 4.5cqi, 1.5rem);
   font-weight: 600;
   color: var(--color-text-primary);
+  white-space: nowrap;
 }
 
 .service-description {
@@ -478,6 +507,47 @@ body {
   color: var(--color-text-tertiary);
   background: var(--color-bg-tertiary);
   padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-sm);
+}
+
+/* Service Pricing */
+.service-pricing {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1.25rem;
+}
+
+.service-pricing .price {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.service-pricing .price-original {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.service-pricing .price-promo {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #34d399;
+}
+
+.service-pricing .promo-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #0f172a;
+  background: #34d399;
+  padding: 0.2rem 0.5rem;
   border-radius: var(--radius-sm);
 }
 
@@ -736,12 +806,32 @@ body {
     --section-padding: 4rem;
   }
 
+  .nav-hamburger {
+    display: flex;
+  }
+
   .nav-links {
-    gap: 1.25rem;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 70%;
+    max-width: 300px;
+    height: 100vh;
+    background: var(--color-bg-secondary);
+    border-left: 1px solid var(--color-border);
+    flex-direction: column;
+    padding: 5rem 2rem 2rem;
+    gap: 1.5rem;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+  }
+
+  .nav-links.nav-links-open {
+    right: 0;
   }
 
   .nav-links a {
-    font-size: 0.875rem;
+    font-size: 1.125rem;
   }
 
   .hero {
@@ -900,4 +990,78 @@ body {
 
 .legal-contact a:hover {
   text-decoration: underline;
+}
+
+/* Legal Menu Grid */
+.legal-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.legal-menu-card {
+  display: block;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.legal-menu-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.legal-menu-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.legal-menu-card p {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.legal-menu-link {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+/* Form Status Messages */
+.form-success {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #34d399;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.form-error {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: #f87171;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.logo-small {
+  height: 40px;
+  width: auto;
 }

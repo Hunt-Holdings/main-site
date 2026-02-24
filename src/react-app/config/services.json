@@ -1,0 +1,26 @@
+[
+  {
+    "title": "IT Consulting",
+    "icon": "briefcase",
+    "description": "Strategic technology planning and advice for small businesses. I'll help you figure out what technology you actually need and how to make it work together efficiently.",
+    "features": ["Network Setup", "Security Planning", "Tech Recommendations"],
+    "priceEnvKey": "CONSULTING",
+    "promoEnvKey": "CONSULTING"
+  },
+  {
+    "title": "Remote Technical Support",
+    "icon": "monitor",
+    "description": "Troubleshooting and fixing technology problems for homes and businesses. Computer acting weird? Printer won't connect? I can help sort it out.",
+    "features": ["Troubleshooting", "Software Issues", "Hardware Problems"],
+    "priceEnvKey": "REMOTE_TECH_SUPPORT",
+    "promoEnvKey": "REMOTE_TECH_SUPPORT"
+  },
+  {
+    "title": "On-Site Services",
+    "icon": "building",
+    "description": "Sometimes you need someone to come to you. I'll come to your home or business for installations, upgrades, or anything that needs hands-on attention.",
+    "features": ["Home Visits", "Equipment Setup", "Network Installation"],
+    "priceEnvKey": "ONSITE_TECH_SUPPORT",
+    "promoEnvKey": "ONSITE_TECH_SUPPORT"
+  }
+]

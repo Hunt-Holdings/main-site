@@ -1,19 +1,86 @@
+import { useState } from "react";
+import WhiteTextLogo from "../assets/images/WhiteTextLogo.png";
+import servicesConfig from "../config/services.json";
+import serviceIcons from "../config/serviceIcons";
+
+// Helper to look up env-var-driven pricing by the key stored in services.json
+const getPrice = (key: string) => import.meta.env[`VITE_PRICE_${key}`] as string | undefined;
+const getPromoPrice = (key: string | undefined) =>
+  key ? (import.meta.env[`VITE_PROMO_PRICE_${key}`] as string | undefined) : undefined;
+
 const Home = () => {
   const companyName = import.meta.env.VITE_COMPANY_NAME;
   const phoneNumber = import.meta.env.VITE_PHONE_NUMBER;
   const email = import.meta.env.VITE_EMAIL;
   const linkedinUrl = import.meta.env.VITE_LINKEDIN_URL;
 
+  // Promo toggle
+  const promoEnabled = import.meta.env.VITE_PROMO_ENABLED === "true";
+
+  // Mobile menu
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Contact form
+  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [formError, setFormError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormStatus("sending");
+    setFormError("");
+
+    const form = e.currentTarget;
+    const data = {
+      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
+      message: (form.elements.namedItem("message") as HTMLTextAreaElement).value,
+    };
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setFormStatus("sent");
+        form.reset();
+      } else {
+        setFormStatus("error");
+        setFormError(json.error || "Something went wrong.");
+      }
+    } catch {
+      setFormStatus("error");
+      setFormError("Unable to reach the server. Please try again later.");
+    }
+  };
+
   return (
     <div className="app">
       {/* Navigation */}
       <nav className="nav">
         <div className="nav-container">
-          <div className="nav-brand">Carson Hunt</div>
-          <div className="nav-links">
-            <a href="#about">About</a>
-            <a href="#services">Services</a>
-            <a href="#contact">Contact</a>
+          <img src={WhiteTextLogo} alt="Carson Hunt Logo" className="nav-brand logo-small" />
+          <button
+            className={`nav-hamburger ${menuOpen ? "open" : ""}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+          <div className={`nav-links ${menuOpen ? "nav-links-open" : ""}`}>
+            <a href="#about" onClick={() => setMenuOpen(false)}>
+              About
+            </a>
+            <a href="#services" onClick={() => setMenuOpen(false)}>
+              Services
+            </a>
+            <a href="#contact" onClick={() => setMenuOpen(false)}>
+              Contact
+            </a>
           </div>
         </div>
       </nav>
@@ -22,24 +89,16 @@ const Home = () => {
       <section className="hero">
         <div className="hero-container">
           <div className="hero-content">
-            <div className="hero-eyebrow">
-              IT Consulting & Technical Support
-            </div>
+            <div className="hero-eyebrow">{servicesConfig.map((s) => s.title).join(" & ")}</div>
             <h1 className="hero-title">Hi, I'm Carson Hunt</h1>
             <p className="hero-description">
-              I help people and businesses in the Memphis area solve their
-              technology problems. Whether you need a home network set up,
-              business IT consulting, or just someone to fix that computer issue
-              that's been driving you crazy.
+              I help people and businesses in the Memphis area solve their technology problems.
+              Whether you need a home network set up, business IT consulting, or just someone to fix
+              that computer issue that's been driving you crazy.
             </p>
             <div className="hero-meta">
               <div className="meta-item">
-                <svg
-                  className="meta-icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
+                <svg className="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -56,12 +115,7 @@ const Home = () => {
                 <span>Serving Bartlett & Greater Memphis</span>
               </div>
               <div className="meta-item">
-                <svg
-                  className="meta-icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
+                <svg className="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -76,10 +130,7 @@ const Home = () => {
               <a href="#contact" className="btn btn-primary">
                 Get In Touch
               </a>
-              <a
-                href={`tel:${phoneNumber.replace(/-/g, "")}`}
-                className="btn btn-secondary"
-              >
+              <a href={`tel:${phoneNumber.replace(/-/g, "")}`} className="btn btn-secondary">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path
                     strokeLinecap="round"
@@ -114,25 +165,20 @@ const Home = () => {
         <div className="container">
           <div className="section-header">
             <span className="section-eyebrow">About Me</span>
-            <h2 className="section-title">
-              Technology Doesn't Have to Be Complicated
-            </h2>
+            <h2 className="section-title">Technology Doesn't Have to Be Complicated</h2>
           </div>
           <div className="about-content">
             <p className="about-text">
-              I'm Carson Hunt, owner of {companyName} and an IT professional
-              based in Bartlett, Tennessee. I currently work at St. Jude
-              Children's Research Hospital, and have spent years supporting
-              technology in environments where reliability and accountability
-              matter. My background spans enterprise IT, logistics, and hands-on
-              technical repair, with experience ranging from end-user support
-              and system deployments to managing large inventories and resolving
-              complex, real-world technical issues. I've worked in healthcare,
-              logistics, retail, and small repair shop settings, which gives me
-              a practical, well-rounded approach to technology. Through
-              {companyName}, I bring that same professional standard to helping
-              individuals and small businesses keep their systems stable,
-              secure, and actually usable.
+              I'm Carson Hunt, owner of {companyName} and an IT professional based in Bartlett,
+              Tennessee. I currently work at St. Jude Children's Research Hospital, and have spent
+              years supporting technology in environments where reliability and accountability
+              matter. My background spans enterprise IT, logistics, and hands-on technical repair,
+              with experience ranging from end-user support and system deployments to managing large
+              inventories and resolving complex, real-world technical issues. I've worked in
+              healthcare, logistics, retail, and small repair shop settings, which gives me a
+              practical, well-rounded approach to technology. Through {companyName}, I bring that
+              same professional standard to helping individuals and small businesses keep their
+              systems stable, secure, and actually usable.
             </p>
           </div>
         </div>
@@ -146,89 +192,40 @@ const Home = () => {
             <h2 className="section-title">Services I Offer</h2>
           </div>
           <div className="services-grid">
-            <div className="service-card">
-              <div className="service-header">
-                <div className="service-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="service-title">IT Consulting</h3>
-              </div>
-              <p className="service-description">
-                Strategic technology planning and advice for small businesses.
-                I'll help you figure out what technology you actually need and
-                how to make it work together efficiently.
-              </p>
-              <div className="service-features">
-                <div className="feature">Network Setup</div>
-                <div className="feature">Security Planning</div>
-                <div className="feature">Tech Recommendations</div>
-              </div>
-            </div>
+            {servicesConfig.map((service) => {
+              const price = getPrice(service.priceEnvKey);
+              const promoPrice = getPromoPrice(service.promoEnvKey);
 
-            <div className="service-card">
-              <div className="service-header">
-                <div className="service-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
+              return (
+                <div className="service-card" key={service.title}>
+                  <div className="service-header">
+                    <div className="service-icon">{serviceIcons[service.icon] ?? null}</div>
+                    <h3 className="service-title">{service.title}</h3>
+                  </div>
+                  <p className="service-description">{service.description}</p>
+                  {price && (
+                    <div className="service-pricing">
+                      {promoEnabled && promoPrice ? (
+                        <>
+                          <span className="price-original">{price}</span>
+                          <span className="price-promo">{promoPrice}</span>
+                          <span className="promo-badge">Promo</span>
+                        </>
+                      ) : (
+                        <span className="price">{price}</span>
+                      )}
+                    </div>
+                  )}
+                  <div className="service-features">
+                    {service.features.map((f) => (
+                      <div className="feature" key={f}>
+                        {f}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <h3 className="service-title">Technical Support</h3>
-              </div>
-              <p className="service-description">
-                Troubleshooting and fixing technology problems for homes and
-                businesses. Computer acting weird? Printer won't connect? I can
-                help sort it out.
-              </p>
-              <div className="service-features">
-                <div className="feature">Troubleshooting</div>
-                <div className="feature">Software Issues</div>
-                <div className="feature">Hardware Problems</div>
-              </div>
-            </div>
-
-            <div className="service-card">
-              <div className="service-header">
-                <div className="service-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                    />
-                  </svg>
-                </div>
-                <h3 className="service-title">On-Site Services</h3>
-              </div>
-              <p className="service-description">
-                Sometimes you need someone to come to you. I'll come to your
-                home or business for installations, upgrades, or anything that
-                needs hands-on attention.
-              </p>
-              <div className="service-features">
-                <div className="feature">Home Visits</div>
-                <div className="feature">Equipment Setup</div>
-                <div className="feature">Network Installation</div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -243,15 +240,12 @@ const Home = () => {
                 <h2 className="section-title">Let's Talk About Your Tech</h2>
               </div>
               <p className="contact-intro">
-                Have a question or need help with something? Drop me a line and
-                I'll get back to you as soon as I can. No question is too small.
+                Have a question or need help with something? Drop me a line and I'll get back to you
+                as soon as I can. No question is too small.
               </p>
 
               <div className="contact-methods">
-                <a
-                  href={`tel:${phoneNumber.replace(/-/g, "")}`}
-                  className="contact-item"
-                >
+                <a href={`tel:${phoneNumber.replace(/-/g, "")}`} className="contact-item">
                   <div className="contact-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path
@@ -302,21 +296,10 @@ const Home = () => {
             </div>
 
             <div className="contact-form-wrapper">
-              <form
-                className="contact-form"
-                action={`mailto:${email}`}
-                method="post"
-                encType="text/plain"
-              >
+              <form className="contact-form" onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label htmlFor="name">Name</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    placeholder="Your full name"
-                    required
-                  />
+                  <input type="text" id="name" name="name" placeholder="Your full name" required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="email">Email</label>
@@ -338,9 +321,17 @@ const Home = () => {
                     required
                   ></textarea>
                 </div>
-                <button type="submit" className="btn btn-primary btn-full">
-                  Send Message
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-full"
+                  disabled={formStatus === "sending"}
+                >
+                  {formStatus === "sending" ? "Sending..." : "Send Message"}
                 </button>
+                {formStatus === "sent" && (
+                  <p className="form-success">Message received! I'll get back to you soon.</p>
+                )}
+                {formStatus === "error" && <p className="form-error">{formError}</p>}
               </form>
             </div>
           </div>
@@ -354,16 +345,18 @@ const Home = () => {
             <div className="footer-brand">
               <h3>Carson Hunt</h3>
               <p>
-                IT consulting and technical support for the Memphis area.
-                Operating as {companyName}.
+                IT consulting and technical support for the Memphis area. Operating as {companyName}
+                .
               </p>
             </div>
             <div className="footer-links">
               <div className="footer-column">
                 <h4>Services</h4>
-                <a href="#services">IT Consulting</a>
-                <a href="#services">Technical Support</a>
-                <a href="#services">On-Site Services</a>
+                {servicesConfig.map((s) => (
+                  <a href="#services" key={s.title}>
+                    {s.title}
+                  </a>
+                ))}
               </div>
               <div className="footer-column">
                 <h4>Connect</h4>
@@ -373,7 +366,9 @@ const Home = () => {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2025 {companyName}. All rights reserved.</p>
+            <p>
+              &copy; {new Date().getFullYear()} {companyName}. All rights reserved.
+            </p>
             <p>Bartlett, Tennessee</p>
           </div>
         </div>

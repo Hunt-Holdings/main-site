@@ -6,10 +6,8 @@ const TechSupportTerms = () => {
   const phone = import.meta.env.VITE_PHONE_NUMBER ?? "555-555-5555";
   const email = import.meta.env.VITE_EMAIL ?? "email@notfound.404";
   const effective = import.meta.env.VITE_TERMS_EFFECTIVE_DATE ?? "1970-01-01";
-  const businessName =
-    import.meta.env.VITE_BUSINESS_NAME ?? "Business Not Found";
-  const supportEmail =
-    import.meta.env.VITE_SUPPORT_EMAIL ?? " email@notfound.404";
+  const businessName = import.meta.env.VITE_BUSINESS_NAME ?? "Business Not Found";
+  const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL ?? " email@notfound.404";
 
   const cleanPhone = phone.replace(/-/g, "");
 
@@ -40,9 +38,7 @@ const TechSupportTerms = () => {
         <div className="container">
           <div className="section-header">
             <span className="section-eyebrow">Legal</span>
-            <h1 className="section-title">
-              Technical Support Terms and Conditions
-            </h1>
+            <h1 className="section-title">Technical Support Terms and Conditions</h1>
           </div>
         </div>
       </section>
@@ -55,8 +51,8 @@ const TechSupportTerms = () => {
           </div>
 
           <div className="legal-contact">
-            <strong>Contact:</strong> <a href={`tel:${cleanPhone}`}>{phone}</a>{" "}
-            · <a href={`mailto:${email}`}>{email}</a>
+            <strong>Contact:</strong> <a href={`tel:${cleanPhone}`}>{phone}</a> ·{" "}
+            <a href={`mailto:${email}`}>{email}</a>
           </div>
         </div>
       </section>
@@ -71,7 +67,9 @@ const TechSupportTerms = () => {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2025 {companyName}. All rights reserved.</p>
+            <p>
+              &copy; {new Date().getFullYear()} {companyName}. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
