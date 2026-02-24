@@ -43,10 +43,7 @@ app.post("/api/contact", async (c) => {
     if (!resendRes.ok) {
       const errBody = await resendRes.text();
       console.error("Resend API error:", resendRes.status, errBody);
-      return c.json(
-        { success: false, error: "Failed to send message. Please try again later." },
-        500,
-      );
+      return c.json({ success: false, error: `Resend error ${resendRes.status}: ${errBody}` }, 500);
     }
 
     return c.json({ success: true, message: "Message received! I'll get back to you soon." });
@@ -156,7 +153,7 @@ function buildContactEmail(name: string, email: string, message: string): string
                     <p style="margin:0 0 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;">
                       Message
                     </p>
-                    <td>
+                  </td>
                 </tr>
                 <tr>
                   <td style="padding:20px 24px;background-color:#242938;border-radius:12px;">
