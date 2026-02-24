@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import WhiteTextLogo from "../assets/images/WhiteTextLogo.png";
 import servicesConfig from "../config/services.json";
 import serviceIcons from "../config/serviceIcons";
@@ -16,6 +16,46 @@ const Home = () => {
 
   // Promo toggle
   const promoEnabled = import.meta.env.VITE_PROMO_ENABLED === "true";
+  const promoText = import.meta.env.VITE_PROMO_TEXT as string | undefined;
+  const promoEndDate = import.meta.env.VITE_PROMO_END_DATE as string | undefined;
+
+  // Countdown timer for promo banner
+  const [timeLeft, setTimeLeft] = useState("");
+  const [promoExpired, setPromoExpired] = useState(false);
+
+  useEffect(() => {
+    if (!promoEnabled || !promoEndDate) return;
+
+    const endTime = new Date(promoEndDate).getTime();
+
+    const tick = () => {
+      const now = Date.now();
+      const diff = endTime - now;
+
+      if (diff <= 0) {
+        setPromoExpired(true);
+        setTimeLeft("");
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      const parts: string[] = [];
+      if (days > 0) parts.push(`${days}d`);
+      parts.push(`${hours}h`);
+      parts.push(`${String(minutes).padStart(2, "0")}m`);
+      parts.push(`${String(seconds).padStart(2, "0")}s`);
+
+      setTimeLeft(parts.join(" "));
+    };
+
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [promoEnabled, promoEndDate]);
 
   // Mobile menu
   const [menuOpen, setMenuOpen] = useState(false);
@@ -84,6 +124,21 @@ const Home = () => {
           </div>
         </div>
       </nav>
+
+      {/* Promo Banner */}
+      {promoEnabled && !promoExpired && promoText && (
+        <div className="promo-banner">
+          <div className="promo-banner-content">
+            <span className="promo-banner-tag">LIMITED OFFER</span>
+            <span className="promo-banner-text">{promoText}</span>
+            {timeLeft && (
+              <span className="promo-banner-countdown">
+                Ends in <strong>{timeLeft}</strong>
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="hero">
@@ -192,6 +247,47 @@ const Home = () => {
             <h2 className="section-title">Services I Offer</h2>
           </div>
           <div className="services-grid">
+            {promoEnabled && !promoExpired && promoText && (
+              <div className="promo-callout" style={{ gridColumn: "1 / -1" }}>
+                <div className="promo-callout-icon">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="20 12 20 22 4 22 4 12" />
+                    <rect x="2" y="7" width="20" height="5" />
+                    <line x1="12" y1="22" x2="12" y2="7" />
+                    <path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" />
+                    <path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" />
+                  </svg>
+                </div>
+                <div className="promo-callout-body">
+                  <p className="promo-callout-title">{promoText}</p>
+                  <p className="promo-callout-text">
+                    All services are offered at reduced promotional rates — look for the
+                    <span
+                      className="promo-badge"
+                      style={{ margin: "0 0.35rem", verticalAlign: "middle" }}
+                    >
+                      Promo
+                    </span>
+                    prices on each service below.
+                  </p>
+                </div>
+                {timeLeft && (
+                  <div>
+                    <span className="promo-callout-timer-label">Offer ends in</span>
+                    <span className="promo-callout-timer">{timeLeft}</span>
+                  </div>
+                )}
+              </div>
+            )}
             {servicesConfig.map((service) => {
               const price = getPrice(service.priceEnvKey);
               const promoPrice = getPromoPrice(service.promoEnvKey);
