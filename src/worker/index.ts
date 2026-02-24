@@ -43,7 +43,19 @@ app.post("/api/contact", async (c) => {
     if (!resendRes.ok) {
       const errBody = await resendRes.text();
       console.error("Resend API error:", resendRes.status, errBody);
-      return c.json({ success: false, error: `Resend error ${resendRes.status}: ${errBody}` }, 500);
+
+      let userMessage = "Something went wrong while sending your message.";
+      if (resendRes.status === 401) {
+        userMessage = "Email service authentication failed. Please contact us directly.";
+      } else if (resendRes.status === 403) {
+        userMessage = "Email service permissions error. Please contact us directly.";
+      } else if (resendRes.status === 429) {
+        userMessage = "Too many requests — please wait a moment and try again.";
+      } else if (resendRes.status >= 500) {
+        userMessage = "Our email provider is temporarily unavailable. Please try again later.";
+      }
+
+      return c.json({ success: false, error: userMessage }, 500);
     }
 
     return c.json({ success: true, message: "Message received! I'll get back to you soon." });
